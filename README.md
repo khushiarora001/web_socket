@@ -70,7 +70,7 @@ Installation
 
 Clone the repository:
 
-git clone https://github.com/your-repo/websocket-assessment.git
+git clone https://github.com/khushiarora001/web_socket
 
 # Navigate to the project directory:
 
