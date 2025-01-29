@@ -4,7 +4,14 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
-class OtpSent extends AuthState {}
+class OtpSent extends AuthState {
+  final String sessionId;
+
+  OtpSent(this.sessionId);
+
+  @override
+  List<Object?> get props => [sessionId];
+}
 
 class AuthSuccess extends AuthState {}
 

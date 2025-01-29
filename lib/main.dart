@@ -9,7 +9,7 @@ import 'package:web_socket_assetment/constant/constant.dart';
 import 'package:web_socket_assetment/repositories/auth_repository.dart';
 import 'package:web_socket_assetment/repositories/event_repository.dart';
 import 'package:web_socket_assetment/repositories/order_repository.dart';
-import 'package:web_socket_assetment/route/appprouter.dart';
+import 'package:web_socket_assetment/route/approuter.dart';
 import 'package:web_socket_assetment/service/socket_service.dart';
 import 'package:web_socket_assetment/utils/data_source/api_service.dart';
 

@@ -5,12 +5,11 @@ import 'package:web_socket_assetment/models/order_book_model.dart';
 
 import 'package:web_socket_assetment/service/socket_service.dart';
 
-class WebSocketBloc extends Bloc<OrderEvent, WebSocketState> {
+class WebSocketBloc extends Bloc<WebBlocEvent, WebSocketState> {
   final WebSocketService
       webSocketService; // WebSocket service for managing connections
 
   WebSocketBloc({required this.webSocketService}) : super(OrderInitial()) {
-    on<UpdateOrderBookEvent>(_onUpdateOrderBookEvent);
     on<OrderErrorEvent>(_onOrderErrorEvent);
 
     // Listening to the WebSocket stream and adding events accordingly
@@ -19,7 +18,12 @@ class WebSocketBloc extends Bloc<OrderEvent, WebSocketState> {
         try {
           // Parse the WebSocket message to OrderBookModel
           final OrderBookModel orderBookData = OrderBookModel.fromJson(message);
-          add(UpdateOrderBookEvent(orderBookData));
+          final orderBookDataMap = orderBookData.toMap();
+
+          add(UpdateOrderBookEvent(
+            key: 'orderbook_update',
+            data: orderBookDataMap,
+          ));
         } catch (e) {
           // Emit an error event if parsing fails
           add(OrderErrorEvent(e.toString()));
@@ -30,12 +34,6 @@ class WebSocketBloc extends Bloc<OrderEvent, WebSocketState> {
         add(OrderErrorEvent(error.toString()));
       },
     );
-  }
-
-  // Handling UpdateOrderBookEvent
-  void _onUpdateOrderBookEvent(
-      UpdateOrderBookEvent event, Emitter<WebSocketState> emit) {
-    emit(OrderBookUpdated(event.orderBookData));
   }
 
   // Handling OrderErrorEvent

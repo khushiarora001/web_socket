@@ -1,3 +1,3 @@
 class RouteConstant {
-  static const eventsRoute = "/eventsRoute";
+  static const eventsRoute = "/events";
 }

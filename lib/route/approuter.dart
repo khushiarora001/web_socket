@@ -18,14 +18,17 @@ class AppRouter {
         builder: (context, state) => EventsScreen(),
       ),
       GoRoute(
-        path: '/order',
+        path: '/order/:id',
+        name: 'order',
         builder: (context, state) {
-          final eventId = state.pathParameters['eventId'] ?? "2";
-          return OrderScreen(eventId: eventId);
+          final eventId = state.pathParameters['id'] ?? '';
+          final extra = state.extra as Map<String, dynamic>?;
+          return OrderScreen(eventId: eventId, extra: extra);
         },
       ),
       GoRoute(
         path: '/order-book',
+        name: 'order-book',
         builder: (context, state) => OrderBookPage(),
       ),
     ],

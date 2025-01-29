@@ -77,7 +77,6 @@ class Helper {
   //Show Loader
   static void showLoaderDialog(BuildContext context) {
     AlertDialog alert = const AlertDialog(
-      backgroundColor: whiteColor,
       content: Row(
         children: [
           SizedBox(
@@ -85,7 +84,7 @@ class Helper {
               width: 80,
               child: Center(child: CircularProgressIndicator())),
           Text(
-            "pleaseWaitTxt",
+            "Please Wait",
           )
         ],
       ),

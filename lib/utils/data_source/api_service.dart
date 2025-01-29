@@ -72,7 +72,7 @@ class APIUtils {
       http.Response apiResponse = await http.put(await _apiPath(apiUrl, "PUT"),
           body: jsonEncode(requestBody),
           headers: enableHeader ? await _headers() : {});
-
+      log(apiResponse.toString());
       //Checking for the response code and handling the result.
       return _returnResponse(apiResponse);
     }
@@ -125,7 +125,7 @@ class APIUtils {
       //  onTimeout: () {
       //    throw FetchDataException(FAILURE_OCCURED);
       //  });
-      log(apiResponse.toString());
+      log(apiResponse.body.toString());
       //Checking for the response code and handling the result.
       return _returnResponse(apiResponse);
     }
@@ -137,6 +137,7 @@ class APIUtils {
   }
 
   static var headers = {
+    'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
   };
   static Future<Uri> _apiPath(String url, String method) async {
@@ -153,17 +154,41 @@ class APIUtils {
     log("TOKEN: $authToken");
     //Creating http headers for api
     Map<String, String> headers = {
-      'Access-Control-Allow-Origin': '*',
-      'Authorization': authToken,
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json'
     };
     return headers;
   }
 
+  static Future<List<dynamic>> getEvents(
+    String apiUrl,
+  ) async {
+    try {
+      // Remote Call to API with URL
+      http.Response apiResponse = await http.get(
+        await _apiPath(apiUrl, "GET"),
+      );
+      log(apiResponse.toString());
+      // Checking the response code and handling the result
+      return _returnResponse(apiResponse);
+
+      // Assuming the API response has a key "data" that contains the list of events
+    } on SocketException {
+      throw FetchDataException("Failure Occured");
+    }
+  }
+
+  // Handling the condition when a socket exception occurs
+
   ///Function to handle the response as per status code from api server
   static dynamic _returnResponse(http.Response response) {
     switch (response.statusCode) {
       case 200:
+        var responseJson = jsonDecode(response.body);
+        // Helper.printJSONData(responseJson);
+        return responseJson;
+
+      case 201:
         var responseJson = jsonDecode(response.body);
         // Helper.printJSONData(responseJson);
         return responseJson;
@@ -188,7 +213,7 @@ class APIUtils {
     var token = await prefs.getString('token');
 
     //Returning the final auth token as result
-    return "Authorization Bearer $token";
+    return "$token";
   }
 
   static Future<dynamic> postMultipartRequest(

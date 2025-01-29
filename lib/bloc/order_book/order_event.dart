@@ -6,7 +6,7 @@ class PlaceOrderEvent extends OrderEvent {
   final String eventId;
   final String type;
   final int quantity;
-  final double price;
+  final num price;
 
   PlaceOrderEvent({
     required this.eventId,

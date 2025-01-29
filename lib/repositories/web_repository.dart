@@ -3,10 +3,10 @@
 import 'package:web_socket_assetment/models/order_book_model.dart';
 import 'package:web_socket_assetment/service/socket_service.dart';
 
-class OrderRepository {
+class WebRepository {
   final WebSocketService webSocketService;
 
-  OrderRepository({required this.webSocketService});
+  WebRepository({required this.webSocketService});
 
   // Method to listen for WebSocket messages and update the order book
   Stream<OrderBookModel> getOrderBookUpdates() {

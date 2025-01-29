@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 import 'package:web_socket_assetment/bloc/auth/auth_bloc.dart';
 import 'package:web_socket_assetment/bloc/auth/auth_event.dart';
 import 'package:web_socket_assetment/bloc/auth/auth_state.dart';
 import 'package:web_socket_assetment/constant/constant.dart';
 import 'package:web_socket_assetment/constant/route_constant.dart';
+import 'package:web_socket_assetment/utils/ui_utils/helper.dart';
 
 import '../utils/ui_utils/custom_textfield.dart';
 
@@ -18,11 +21,34 @@ class LoginPage extends StatelessWidget {
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is LoginError) {
+            Helper.hideLoader(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
+            if (state is AuthLoading) {
+              Helper.showLoaderDialog(context);
+            }
+            // Retain OTP field if it was already sent
+            if (state is AuthError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+            }
+          } else if (state is OtpSent) {
+            Helper.hideLoader(context);
+            // Show Toast on OTP Sent
+            Fluttertoast.showToast(
+              msg: "OTP sent successfully!",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
           } else if (state is LoginSuccess) {
-            Navigator.pushReplacementNamed(context, RouteConstant.eventsRoute);
+            Helper.hideLoader(context);
+            context.go(RouteConstant.eventsRoute);
           }
         },
         child: SingleChildScrollView(
@@ -45,12 +71,13 @@ class LoginPage extends StatelessWidget {
                   SizedBox(height: 20),
 
                   // Phone Number Input Field
-                  CustomTextField(
-                    controller: phoneController,
-                    labelText: "Phone Number",
-                    keyboardType: TextInputType.phone,
-                    hintText: AppConstants.phoneNumberHint,
-                  ),
+                  if (context.watch<AuthBloc>().state is! OtpSent)
+                    CustomTextField(
+                      controller: phoneController,
+                      labelText: "Phone Number",
+                      keyboardType: TextInputType.phone,
+                      hintText: AppConstants.phoneNumberHint,
+                    ),
                   SizedBox(height: 20),
 
                   // OTP Input Field (only visible when OTP is sent)
@@ -76,15 +103,16 @@ class LoginPage extends StatelessWidget {
                                 otpController.text.length != 6) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                    content:
-                                        Text(AppConstants.invalidOtpError)),
+                                  content: Text(AppConstants.invalidOtpError),
+                                ),
                               );
                               return;
                             }
+                            Helper.showLoaderDialog(context);
                             context.read<AuthBloc>().add(
                                   VerifyOtpEvent(
                                     phoneController.text,
-                                    AppConstants.sessionID,
+                                    state.sessionId,
                                     otpController.text,
                                   ),
                                 );
@@ -93,11 +121,12 @@ class LoginPage extends StatelessWidget {
                                 phoneController.text.length != 10) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                    content:
-                                        Text(AppConstants.invalidPhoneError)),
+                                  content: Text(AppConstants.invalidPhoneError),
+                                ),
                               );
                               return;
                             }
+                            Helper.showLoaderDialog(context);
                             context.read<AuthBloc>().add(
                                   SendOtpEvent(phoneController.text),
                                 );

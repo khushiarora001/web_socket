@@ -13,9 +13,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final success = await authRepository.sendOtp(event.mobile);
         if (success.apiStatus == ApiStatus.REQUEST_SUCCESS) {
-          emit(OtpSent());
+          emit(OtpSent(success.data['sessionId'])); // Pass the sessionId here
         } else {
-          emit(AuthError("Failed to send OTP."));
+          emit(LoginError("Something went wrong"));
         }
       } catch (e) {
         emit(AuthError("An error occurred: ${e.toString()}"));
@@ -31,12 +31,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           event.otp,
         );
         if (isLoggedIn.apiStatus == ApiStatus.REQUEST_SUCCESS) {
-          emit(AuthSuccess());
+          emit(LoginSuccess());
         } else {
           emit(AuthError("Invalid OTP."));
-        }
+        } // Add a new state for OTP error
       } catch (e) {
-        emit(AuthError("An error occurred: ${e.toString()}"));
+        emit(LoginError(e.toString()));
       }
     });
   }

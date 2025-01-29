@@ -20,16 +20,24 @@ class WebSocketService {
       _socket = await WebSocket.connect(socketUrl);
       print('Connected to WebSocket: $socketUrl');
 
-      // Listen for messages from the server
-      _socket.listen((data) {
-        final decodedData = json.decode(data);
-        _controller
-            .add(decodedData); // Add incoming data to the stream controller
-      }, onError: (error) {
-        _controller.addError(error); // Add error to the stream
-      }, onDone: () {
-        _controller.close(); // Close the stream when the connection is done
-      });
+      _socket.listen(
+        (data) {
+          try {
+            final decodedData = json.decode(data);
+            _controller.add(decodedData);
+          } catch (e) {
+            print('Error decoding WebSocket message: $e');
+          }
+        },
+        onError: (error) {
+          print('WebSocket error: $error');
+          _controller.addError(error);
+        },
+        onDone: () {
+          print('WebSocket connection closed.');
+          _controller.close();
+        },
+      );
     } catch (e) {
       print('Error connecting to WebSocket: $e');
       _controller.addError(e);
